@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Medical School Journey - Ain Shams University</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        /* --- Ambient Background Glows --- */
+        .ambient-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- Background Typography --- */
+        .phase-text {
+            position: absolute;
+            top: 65%;
+            transform: translateY(-50%);
+            width: 50%;
+            text-align: center;
+            font-size: 4.5vw;
+            font-weight: 800;
+            color: #ffffff;
+            opacity: 0.02;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+        }
+
+        .phase-divider {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+            z-index: 5;
+        }
+
+        /* --- Glowing Energy Track --- */
+        .track-container {
+            position: absolute;
+            top: 45%;
+            left: 10vw;
+            right: 10vw;
+            height: 8px;
+            background-color: rgba(30, 41, 59, 0.8);
+            border-radius: 9999px;
+            z-index: 10;
+        }
+        
+        #progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%; 
+            border-radius: 9999px;
+            overflow: hidden;
+            transition: width 1500ms cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        
+        #gradient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #06b6d4 0%, #10b981 25%, #f59e0b 50%, #f43f5e 75%, #8b5cf6 100%);
+        }
+
+        .energy-glow-soft {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 16px;
+            background: white;
+            opacity: 0.3;
+            filter: blur(8px);
+            border-radius: 9999px;
+        }
+        .energy-glow-core {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 4px;
+            background: white;
+            opacity: 0.8;
+            filter: blur(2px);
+            border-radius: 9999px;
+        }
+
+        /* --- Marker Styles & Animations --- */
+        .milestone-wrapper {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 40;
+        }
+        .milestone-marker {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            z-index: 40;
+        }
+        .milestone-marker:hover {
+            transform: scale(1.15) translateY(-5px);
+            z-index: 50;
+        }
+        
+        /* Locked pulsing ring */
+        .marker-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(var(--marker-color), 0.8);
+            animation: exact-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+            z-index: -1;
+        }
+        @keyframes exact-pulse {
+            0% { transform: scale(0.9); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        /* --- Reached (Unlock) State Animations --- */
+        .node-reached .marker-ring { display: none; }
+        .node-reached .inner-circle {
+            border-color: rgba(var(--marker-color), 1) !important;
+            box-shadow: 0 0 25px rgba(var(--marker-color), 0.9) !important;
+            background-color: rgba(30, 41, 59, 1) !important;
+        }
+
+        /* The Intense Flash Glow when line reaches the node */
+        @keyframes flash-glow {
+            0% { transform: scale(1); box-shadow: 0 0 25px rgba(var(--marker-color), 0.9); filter: brightness(1); }
+            15% { transform: scale(1.15); box-shadow: 0 0 80px 30px rgba(var(--marker-color), 1); background-color: rgba(var(--marker-color), 0.9) !important; filter: brightness(1.5); }
+            100% { transform: scale(1); box-shadow: 0 0 25px rgba(var(--marker-color), 0.9); background-color: rgba(30, 41, 59, 1) !important; filter: brightness(1); }
+        }
+        .anim-flash-glow .inner-circle {
+            animation: flash-glow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* --- Completed State Animations --- */
+        .anim-complete .milestone-marker {
+            animation: complete-hover-marker 1.8s ease-in-out forwards;
+        }
+        @keyframes complete-hover-marker {
+            0% { transform: translateY(0) scale(1); }
+            20% { transform: translateY(-20px) scale(1.1); }
+            80% { transform: translateY(-20px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .anim-complete .inner-circle {
+            animation: complete-glow 1.8s ease-in-out forwards;
+        }
+        @keyframes complete-glow {
+            0% { box-shadow: 0 0 25px rgba(var(--marker-color), 0.9); }
+            20% { box-shadow: 0 0 50px rgba(var(--marker-color), 1); border-color: #fff !important; }
+            80% { box-shadow: 0 0 50px rgba(var(--marker-color), 1); border-color: #fff !important; }
+            100% { box-shadow: 0 0 25px rgba(var(--marker-color), 0.9); border-color: rgba(var(--marker-color), 1) !important;}
+        }
+
+        /* Checkmark pop */
+        .completed-check {
+            opacity: 0;
+            transform: scale(0.5);
+            display: inline-block;
+        }
+        .node-completed .completed-check {
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .anim-complete .completed-check {
+            animation: complete-check-spring 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s forwards;
+        }
+        @keyframes complete-check-spring {
+            0% { opacity: 0; transform: scale(0.5) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* --- Grand Laurel Wreath (Graduation) - Pre-unlock State --- */
+        #marker-grad .inner-circle {
+            border-color: #d4af37 !important;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
+        }
+
+        /* --- SUPREME LAVISH REWARD (Only when REACHED / 100%) --- */
+        
+        /* 1. The Circle Enlarges & Emits a Supreme Pulse */
+        @keyframes supreme-gold-pulse {
+            0% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.8), 0 0 0 0 rgba(251, 191, 36, 0.5); transform: scale(1.1); }
+            50% { box-shadow: 0 0 90px rgba(251, 191, 36, 1), 0 0 0 50px rgba(251, 191, 36, 0); transform: scale(1.25); background-color: rgba(30, 41, 59, 1) !important; }
+            100% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.8), 0 0 0 0 rgba(251, 191, 36, 0); transform: scale(1.1); }
+        }
+        
+        .grad-unlocked .inner-circle {
+            animation: supreme-gold-pulse 3s infinite ease-in-out !important;
+            border-color: #fef08a !important; /* Brighter, purer gold */
+            z-index: 20;
+        }
+
+        /* 2. Laurels Come Alive, Grow Longer, and Breathe Light */
+        @keyframes laurel-alive-left {
+            0% { transform: scaleX(-1) rotate(-15deg) translateY(-8px) scale(1.2); filter: brightness(1.2) drop-shadow(0 0 10px rgba(251,191,36,0.6)); }
+            50% { transform: scaleX(-1) rotate(-25deg) translateY(-16px) scale(1.55); filter: brightness(1.6) drop-shadow(0 0 35px rgba(251,191,36,1)); }
+            100% { transform: scaleX(-1) rotate(-15deg) translateY(-8px) scale(1.2); filter: brightness(1.2) drop-shadow(0 0 10px rgba(251,191,36,0.6)); }
+        }
+        @keyframes laurel-alive-right {
+            0% { transform: scaleX(1) rotate(-15deg) translateY(-8px) scale(1.2); filter: brightness(1.2) drop-shadow(0 0 10px rgba(251,191,36,0.6)); }
+            50% { transform: scaleX(1) rotate(-5deg) translateY(-16px) scale(1.55); filter: brightness(1.6) drop-shadow(0 0 35px rgba(251,191,36,1)); }
+            100% { transform: scaleX(1) rotate(-15deg) translateY(-8px) scale(1.2); filter: brightness(1.2) drop-shadow(0 0 10px rgba(251,191,36,0.6)); }
+        }
+
+        .grad-unlocked .laurel-left {
+            opacity: 1 !important;
+            color: #fde047 !important;
+            animation: laurel-alive-left 3s infinite ease-in-out !important;
+        }
+        .grad-unlocked .laurel-right {
+            opacity: 1 !important;
+            color: #fde047 !important;
+            animation: laurel-alive-right 3s infinite ease-in-out !important;
+        }
+
+        /* 3. Pre-unlock Hover (Subtle sway for when you haven't reached it yet) */
+        @keyframes laurel-hover-sway {
+            0% { transform: scaleX(var(--sx)) rotate(var(--r1)) translateY(-8px); filter: brightness(1) drop-shadow(0 0 5px rgba(212,175,55,0.4)); }
+            100% { transform: scaleX(var(--sx)) rotate(var(--r2)) translateY(-12px); filter: brightness(1.4) drop-shadow(0 0 15px rgba(251,191,36,0.8)); }
+        }
+        .laurel-left { --sx: -1; --r1: -15deg; --r2: -25deg; }
+        .laurel-right { --sx: 1; --r1: -15deg; --r2: -5deg; }
+        
+        #marker-grad:hover:not(.node-reached) .laurel-left, #marker-grad:hover:not(.node-reached) .laurel-right {
+            animation: laurel-hover-sway 1.5s ease-in-out infinite alternate !important;
+            opacity: 1 !important;
+        }
+        #marker-grad:hover:not(.node-reached) .inner-circle {
+            box-shadow: 0 0 40px 10px rgba(251, 191, 36, 0.6) !important;
+            border-color: #fef08a !important;
+        }
+
+        /* Background Sparks behind circle */
+        .sparks-container {
+            position: absolute;
+            inset: -40px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1; 
+        }
+        
+        /* Show simple sparks on hover before unlocked */
+        #marker-grad:hover:not(.node-reached) .sparks-container {
+            opacity: 1;
+        }
+
+        /* 4. Unleash massive automated sparks when UNLOCKED */
+        .grad-unlocked .sparks-container {
+            opacity: 1 !important;
+        }
+        .grad-unlocked .spark {
+            background: #ffffff;
+            box-shadow: 0 0 20px 6px #fde047;
+            width: 7px;
+            height: 7px;
+        }
+
+        .spark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #fef08a;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px #fbbf24;
+            opacity: 0;
+        }
+        
+        /* Standard sparks */
+        @keyframes spark-float {
+            0% { transform: translate(0, 0) scale(1); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        
+        /* Supreme long-distance sparks */
+        @keyframes spark-float-supreme {
+            0% { transform: translate(0, 0) scale(1.5); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translate(calc(var(--tx) * 1.8), calc(var(--ty) * 1.8)) scale(0); opacity: 0; }
+        }
+
+        .s1 { --tx: -60px; --ty: -80px; animation: spark-float 2s infinite 0s ease-out; }
+        .s2 { --tx: 60px; --ty: -70px; animation: spark-float 1.8s infinite 0.4s ease-out; }
+        .s3 { --tx: -20px; --ty: -100px; animation: spark-float 2.2s infinite 0.2s ease-out; }
+        .s4 { --tx: 20px; --ty: -110px; animation: spark-float 2.5s infinite 0.8s ease-out; }
+        .s5 { --tx: -80px; --ty: 20px; animation: spark-float 1.9s infinite 0.5s ease-out; }
+        .s6 { --tx: 80px; --ty: 30px; animation: spark-float 2.1s infinite 0.1s ease-out; }
+
+        /* Override with supreme animation when unlocked */
+        .grad-unlocked .s1 { animation: spark-float-supreme 2.5s infinite 0s ease-out; }
+        .grad-unlocked .s2 { animation: spark-float-supreme 2.2s infinite 0.4s ease-out; }
+        .grad-unlocked .s3 { animation: spark-float-supreme 2.8s infinite 0.2s ease-out; }
+        .grad-unlocked .s4 { animation: spark-float-supreme 3.1s infinite 0.8s ease-out; }
+        .grad-unlocked .s5 { animation: spark-float-supreme 2.4s infinite 0.5s ease-out; }
+        .grad-unlocked .s6 { animation: spark-float-supreme 2.6s infinite 0.1s ease-out; }
+
+        /* --- Dropdown Smooth Animation --- */
+        .dropdown-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        .dropdown-wrapper.open {
+            grid-template-rows: 1fr;
+        }
+        .dropdown-inner {
+            min-height: 0;
+        }
+
+        /* --- Semester Tick Animation inside Modal --- */
+        @keyframes card-success {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); box-shadow: 0 15px 30px rgba(var(--marker-color), 0.4); border-color: rgba(var(--marker-color), 1); }
+            100% { transform: scale(1); }
+        }
+        .animate-card-success {
+            animation: card-success 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* --- Glassmorphism Panel --- */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- OVERVIEW BOARD -->
+    <div id="board-view" class="relative w-full h-screen transition-all duration-700 ease-in-out flex items-center justify-center">
+        
+        <!-- Ambient Glows -->
+        <div class="ambient-glow w-[800px] h-[800px] bg-cyan-600 top-[-200px] left-[-200px]"></div>
+        <div class="ambient-glow w-[600px] h-[600px] bg-violet-600 bottom-[-100px] right-[-100px]"></div>
+
+        <!-- Academic vs Clinical Background Text -->
+        <div class="phase-text left-0">ACADEMIC</div>
+        <div class="phase-text right-0">CLINICAL</div>
+        
+        <div class="phase-divider"></div>
+
+        <!-- Header -->
+        <div class="absolute top-10 left-12 z-50">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-md">
+                My Medical Journey
+            </h1>
+            <p class="text-xl text-slate-400 font-semibold mt-2">Ain Shams University Faculty of Medicine</p>
+            <div class="mt-4 flex items-center gap-4">
+                <div class="inline-block px-4 py-1.5 bg-slate-800 rounded-full text-sm font-bold text-cyan-400 border border-cyan-900/50 shadow-lg">
+                    Tracking 5 Years of Excellence
+                </div>
+                <div class="text-sm text-slate-400 font-medium hidden md:block">
+                    Overall Progress: <span id="overall-progress-text" class="text-white font-bold text-lg ml-1 transition-all duration-500">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Countdown Timer (Slightly Enlarged) -->
+        <div class="absolute top-10 right-12 z-50 bg-slate-800/80 backdrop-blur-md rounded-2xl border border-slate-700 p-5 shadow-2xl hidden md:block transform hover:-translate-y-1 transition-transform duration-300">
+            <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-3 text-center flex items-center justify-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span> Time Until Last Exam
+            </div>
+            <div class="flex items-center justify-center gap-4 text-center" id="countdown-timer">
+                <div class="flex flex-col items-center"><span class="text-3xl font-extrabold text-cyan-400" id="cd-years">0</span><span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Years</span></div>
+                <div class="text-slate-600 font-bold text-2xl pb-4">:</div>
+                <div class="flex flex-col items-center"><span class="text-3xl font-extrabold text-cyan-400" id="cd-months">0</span><span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Months</span></div>
+                <div class="text-slate-600 font-bold text-2xl pb-4">:</div>
+                <div class="flex flex-col items-center"><span class="text-3xl font-extrabold text-cyan-400" id="cd-days">0</span><span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Days</span></div>
+                <div class="text-slate-600 font-bold text-2xl pb-4">:</div>
+                <div class="flex flex-col items-center"><span class="text-3xl font-extrabold text-emerald-400" id="cd-hours">00</span><span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Hours</span></div>
+                
+                <div class="flex flex-col items-center ml-2 justify-center pt-1.5"><span class="text-xl font-bold text-amber-400" id="cd-minutes">00</span><span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Mins</span></div>
+                <div class="flex flex-col items-center ml-1.5 justify-center pt-1.5"><span class="text-xl font-bold text-rose-400" id="cd-seconds">00</span><span class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Secs</span></div>
+            </div>
+        </div>
+
+        <!-- The Glowing Energy Track Container -->
+        <div id="track-container" class="track-container">
+            <!-- The Moving Line -->
+            <div id="progress-fill">
+                <!-- Static Full-Width Gradient -->
+                <div id="gradient-bg"></div>
+                <!-- Leading Comet Tail Glows -->
+                <div class="energy-glow-soft"></div>
+                <div class="energy-glow-core"></div>
+            </div>
+
+            <!-- MILESTONES -->
+            
+            <!-- Year 1 (Start 0%) -->
+            <div id="marker-year1" class="milestone-wrapper" style="left: 0%; --marker-color: 6, 182, 212;" onclick="openYear('year1')">
+                <div class="milestone-marker flex flex-col items-center justify-center">
+                    <div class="marker-ring"></div>
+                    <div class="inner-circle relative w-16 h-16 md:w-20 md:h-20 bg-slate-800 rounded-full flex flex-col items-center justify-center text-white border-4 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-500 z-10">
+                        <span class="text-2xl md:text-3xl font-bold">1</span>
+                        <span class="text-[8px] md:text-[10px] uppercase font-bold tracking-wider mt-1 text-slate-300">Year</span>
+                    </div>
+                    <div class="absolute top-full mt-6 text-center w-48 pointer-events-none">
+                        <p class="font-bold text-cyan-400 text-sm flex justify-center items-center gap-1.5">
+                            The Foundation <span class="completed-check text-emerald-400 text-lg">✔</span>
+                        </p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Academic</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Year 2 (20%) -->
+            <div id="marker-year2" class="milestone-wrapper" style="left: 20%; --marker-color: 16, 185, 129;" onclick="openYear('year2')">
+                <div class="milestone-marker flex flex-col items-center justify-center">
+                    <div class="marker-ring"></div>
+                    <div class="inner-circle relative w-16 h-16 md:w-20 md:h-20 bg-slate-800 rounded-full flex flex-col items-center justify-center text-white border-4 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all duration-500 z-10">
+                        <span class="text-2xl md:text-3xl font-bold">2</span>
+                        <span class="text-[8px] md:text-[10px] uppercase font-bold tracking-wider mt-1 text-slate-300">Year</span>
+                    </div>
+                    <div class="absolute top-full mt-6 text-center w-48 pointer-events-none">
+                        <p class="font-bold text-emerald-400 text-sm flex justify-center items-center gap-1.5">
+                            System Growth <span class="completed-check text-emerald-400 text-lg">✔</span>
+                        </p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Academic</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Year 3 (40%) -->
+            <div id="marker-year3" class="milestone-wrapper" style="left: 40%; --marker-color: 245, 158, 11;" onclick="openYear('year3')">
+                <div class="milestone-marker flex flex-col items-center justify-center">
+                    <div class="marker-ring"></div>
+                    <div class="inner-circle relative w-16 h-16 md:w-20 md:h-20 bg-slate-800 rounded-full flex flex-col items-center justify-center text-white border-4 border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all duration-500 z-10">
+                        <span class="text-2xl md:text-3xl font-bold">3</span>
+                        <span class="text-[8px] md:text-[10px] uppercase font-bold tracking-wider mt-1 text-slate-300">Year</span>
+                    </div>
+                    <div class="absolute top-full mt-6 text-center w-48 pointer-events-none">
+                        <p class="font-bold text-amber-400 text-sm flex justify-center items-center gap-1.5">
+                            Pre-Clinical <span class="completed-check text-emerald-400 text-lg">✔</span>
+                        </p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Acad/Clin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Year 4 (60%) -->
+            <div id="marker-year4" class="milestone-wrapper" style="left: 60%; --marker-color: 244, 63, 94;" onclick="openYear('year4')">
+                <div class="milestone-marker flex flex-col items-center justify-center">
+                    <div class="marker-ring"></div>
+                    <div class="inner-circle relative w-16 h-16 md:w-20 md:h-20 bg-slate-800 rounded-full flex flex-col items-center justify-center text-white border-4 border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)] transition-all duration-500 z-10">
+                        <span class="text-2xl md:text-3xl font-bold">4</span>
+                        <span class="text-[8px] md:text-[10px] uppercase font-bold tracking-wider mt-1 text-slate-300">Year</span>
+                    </div>
+                    <div class="absolute top-full mt-6 text-center w-48 pointer-events-none">
+                        <p class="font-bold text-rose-400 text-sm flex justify-center items-center gap-1.5">
+                            Intense Clinical <span class="completed-check text-emerald-400 text-lg">✔</span>
+                        </p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Clinical</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Year 5 (80%) -->
+            <div id="marker-year5" class="milestone-wrapper" style="left: 80%; --marker-color: 139, 92, 246;" onclick="openYear('year5')">
+                <div class="milestone-marker flex flex-col items-center justify-center">
+                    <div class="marker-ring"></div>
+                    <div class="inner-circle relative w-16 h-16 md:w-20 md:h-20 bg-slate-800 rounded-full flex flex-col items-center justify-center text-white border-4 border-violet-500 shadow-[0_0_20px_rgba(139,92,246,0.5)] transition-all duration-500 z-10">
+                        <span class="text-3xl md:text-4xl font-extrabold">5</span>
+                        <span class="text-[8px] md:text-[10px] uppercase font-bold tracking-wider mt-1 text-slate-300">Year</span>
+                    </div>
+                    <div class="absolute top-full mt-6 text-center w-48 pointer-events-none">
+                        <p class="font-bold text-violet-400 text-sm flex justify-center items-center gap-1.5">
+                            Final Year <span class="completed-check text-emerald-400 text-lg">✔</span>
+                        </p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Clinical</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graduation (100%) -->
+            <div id="marker-grad" class="milestone-wrapper" style="left: 100%; --marker-color: 212, 175, 55;">
+                
+                <!-- Grand Circular Laurel Wreath -->
+                <div class="absolute inset-0 pointer-events-none flex items-center justify-center z-0">
+                    <div class="laurel-left absolute -left-10 md:-left-[3.5rem] text-6xl md:text-[5rem] transition-all duration-700 opacity-40" style="color: #d4af37; transform: scaleX(-1) rotate(-15deg) translateY(-8px);">🌿</div>
+                    <div class="laurel-right absolute -right-10 md:-right-[3.5rem] text-6xl md:text-[5rem] transition-all duration-700 opacity-40" style="color: #d4af37; transform: rotate(-15deg) translateY(-8px);">🌿</div>
+                </div>
+
+                <div class="milestone-marker flex flex-col items-center justify-center cursor-default hover:transform-none relative z-10">
+                    
+                    <!-- Background Sparks -->
+                    <div class="sparks-container">
+                        <div class="spark s1"></div><div class="spark s2"></div><div class="spark s3"></div>
+                        <div class="spark s4"></div><div class="spark s5"></div><div class="spark s6"></div>
+                    </div>
+
+                    <div class="marker-ring" style="border-color: rgba(212, 175, 55, 0.8);"></div>
+                    <div class="inner-circle relative w-20 h-20 md:w-24 md:h-24 bg-slate-800 rounded-full flex flex-col items-center justify-center text-white border-4 transition-all duration-500 z-10">
+                        <span class="text-3xl md:text-4xl">🎓</span>
+                        <span class="text-[10px] uppercase font-bold tracking-wider mt-1" style="color: #d4af37;">Dr.</span>
+                    </div>
+                    <div class="absolute top-full mt-6 text-center w-48 pointer-events-none">
+                        <p class="font-bold text-sm flex justify-center items-center gap-1.5" style="color: #d4af37;">
+                            Graduation <span class="completed-check text-emerald-400 text-lg">✔</span>
+                        </p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">MD Attained</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- DETAIL VIEW OVERLAY -->
+    <div id="detail-view" class="fixed inset-0 z-[100] flex items-center justify-center p-6 opacity-0 pointer-events-none transition-all duration-500 ease-in-out transform scale-95 bg-slate-900/60 backdrop-blur-md">
+        
+        <div class="glass-panel w-full max-w-6xl h-[85vh] rounded-3xl overflow-hidden flex flex-col relative shadow-2xl border border-slate-700">
+            
+            <div id="detail-header" class="px-10 py-8 text-white relative overflow-hidden flex-shrink-0 border-b border-slate-700/50">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full transform translate-x-1/2 -translate-y-1/2"></div>
+                
+                <button onclick="closeYear()" class="absolute top-6 right-8 group flex items-center justify-center gap-2 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full transition-all px-6 py-3 backdrop-blur-md border border-slate-500 shadow-xl cursor-pointer z-50">
+                    <span class="text-xl transform group-hover:-translate-x-1 transition-transform">←</span>
+                    <span class="font-bold text-sm tracking-wide">Back to Map</span>
+                </button>
+
+                <div class="relative z-10">
+                    <span id="detail-badge" class="px-3 py-1 bg-slate-900/50 rounded-full text-xs font-bold tracking-wider uppercase border border-slate-600 text-slate-300"></span>
+                    <h2 id="detail-title" class="text-4xl md:text-5xl font-extrabold mt-3 drop-shadow-md text-white w-4/5"></h2>
+                    <p id="detail-desc" class="mt-2 text-lg text-slate-300 font-medium max-w-2xl"></p>
+                    
+                    <!-- Year Progress Bar -->
+                    <div class="mt-6 w-full max-w-md">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-xs font-bold text-white/80 uppercase tracking-widest">Year Progress</span>
+                            <span id="detail-progress-text" class="text-xs font-extrabold text-white drop-shadow-md">0%</span>
+                        </div>
+                        <div class="w-full h-2 bg-black/30 rounded-full overflow-hidden backdrop-blur-sm border border-white/10 shadow-inner">
+                            <div id="detail-progress-fill" class="h-full bg-white rounded-full transition-all duration-700 ease-out" style="width: 0%; box-shadow: 0 0 10px rgba(255,255,255,0.8);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area (Semesters) -->
+            <div id="detail-content" class="flex-1 overflow-y-auto p-10 bg-slate-900/50">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM MODALS FOR ADD/DELETE -->
+    <div id="add-modal" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-sm transform scale-95 transition-transform duration-300" id="add-modal-panel">
+            <h3 class="text-xl font-bold text-white mb-4">Add New Module</h3>
+            <input type="text" id="new-mod-name" placeholder="Module Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-3 focus:outline-none focus:border-cyan-500 text-sm">
+            <input type="text" id="new-mod-desc" placeholder="Short Description" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-5 focus:outline-none focus:border-cyan-500 text-sm">
+            <div class="flex justify-end gap-3">
+                <button onclick="closeAddModal()" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors text-sm font-semibold">Cancel</button>
+                <button onclick="confirmAddModule()" class="px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500 transition-colors text-sm font-bold shadow-lg shadow-cyan-900/50">Add Module</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-slate-800 border border-rose-900/50 p-6 rounded-2xl shadow-2xl w-full max-w-sm transform scale-95 transition-transform duration-300" id="delete-modal-panel">
+            <div class="flex items-center gap-3 mb-4 text-rose-500">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <h3 class="text-xl font-bold text-white">Delete Module</h3>
+            </div>
+            <p class="text-slate-400 text-sm mb-6">Are you sure you want to delete this module? This action cannot be undone.</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors text-sm font-semibold">Cancel</button>
+                <button onclick="confirmDeleteModule()" class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition-colors text-sm font-bold shadow-lg shadow-rose-900/50">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper function for the 3-exam format
+        const getExamTemplate = (isCompleted = false) => [
+            {name: "Mid-term", completed: isCompleted}, 
+            {name: "Practicals", completed: isCompleted}, 
+            {name: "Final", completed: isCompleted}
+        ];
+
+        // Data Structure for the Years
+        let curriculumData = {
+            year1: {
+                title: "Year 1: The Foundation",
+                badge: "Academic Phase • Basic Sciences",
+                desc: "Laying the groundwork of medical knowledge. Focus on normal structures and basic mechanisms.",
+                themeColor: "cyan-500",
+                semesters: [
+                    { name: "Semester 1", icon: "🧬", modules: [
+                        { name: "Introduction to Anatomy", desc: "Basic terminology, tissues, and skeletal system.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Introduction to Physiology", desc: "Cell physiology, homeostasis, nerve/muscle.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Introduction to Pathology", desc: "Cell injury, adaptation, inflammation.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Biochemistry Basics", desc: "Macromolecules, enzymes, and pathways.", completed: false, exams: getExamTemplate() }
+                    ] },
+                    { name: "Semester 2", icon: "🦠", modules: [
+                        { name: "General Pharmacology", desc: "Pharmacokinetics, pharmacodynamics.", completed: false, exams: getExamTemplate() }, 
+                        { name: "General Pathology", desc: "Hemodynamic disorders, neoplasia.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Infection Module", desc: "Microbiology, virology, bacteriology.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Locomotor Module", desc: "Detailed anatomy and physiology of bones/joints.", completed: false, exams: getExamTemplate() }
+                    ] }
+                ]
+            },
+            year2: {
+                title: "Year 2: System Growth",
+                badge: "Academic Phase • Body Systems",
+                desc: "Deep dive into specific body systems, integrating normal and abnormal functions.",
+                themeColor: "emerald-500",
+                semesters: [
+                    { name: "Semester 3", icon: "🫀", modules: [
+                        { name: "CVS Module", desc: "Cardiovascular system anatomy, physiology, and pathology.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Respiratory Module", desc: "Lungs, airways, and gas exchange mechanics.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Blood Module", desc: "Hematopoiesis, blood components, and immunology.", completed: false, exams: getExamTemplate() }
+                    ] },
+                    { name: "Semester 4", icon: "🧠", modules: [
+                        { name: "CNS Module", desc: "Central and peripheral nervous system.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Special Sense Module", desc: "Vision, hearing, balance, taste, and smell.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Endocrine Module", desc: "Hormones and regulatory mechanisms.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Research", desc: "Medical research principles and methodology.", completed: false, exams: getExamTemplate() }
+                    ] }
+                ]
+            },
+            year3: {
+                title: "Year 3: Pre-Clinical",
+                badge: "Transitional Phase",
+                desc: "Finishing basic sciences and bridging the gap between textbooks and patients.",
+                themeColor: "amber-500",
+                semesters: [
+                    { name: "Semester 5", icon: "🩺", modules: [
+                        { name: "GIT Module", desc: "Gastrointestinal tract and accessory digestive organs.", completed: false, exams: getExamTemplate() }, 
+                        { name: "Urogenital Module", desc: "Renal system and reproductive organs.", completed: false, exams: getExamTemplate() }
+                    ] },
+                    { name: "Semester 6", icon: "⚕️", modules: [
+                        { name: "ENT", desc: "Ear, nose, and throat pathology and basics.", completed: false }, 
+                        { name: "Forensic & Toxicology", desc: "Medical jurisprudence and toxic agents.", completed: false }, 
+                        { name: "Community", desc: "Public health and community medicine.", completed: false }
+                    ] }
+                ]
+            },
+            year4: {
+                title: "Year 4: Intense Clinical",
+                badge: "Clinical Phase • Clerkships",
+                desc: "Full immersion into hospital rotations and direct patient care.",
+                themeColor: "rose-500",
+                semesters: [
+                    { name: "Semester 7", icon: "🏥", modules: [
+                        { name: "Internal Medicine I", desc: "Ward rounds, diagnosis, non-surgical treatments.", completed: false }, 
+                        { name: "Pediatrics", desc: "Neonatology and child health.", completed: false }
+                    ] },
+                    { name: "Semester 8", icon: "👩‍⚕️", modules: [
+                        { name: "General Surgery I", desc: "Pre-op, post-op care, basic surgical principles.", completed: false }, 
+                        { name: "Obstetrics & Gynecology", desc: "Women's health and childbirth.", completed: false }
+                    ] }
+                ]
+            },
+            year5: {
+                title: "Year 5: Final Year",
+                badge: "Clinical Phase • Final Year",
+                desc: "Preparing for graduation, final exams, and the upcoming internship year.",
+                themeColor: "violet-500",
+                semesters: [
+                    { name: "Semester 9", icon: "🔬", modules: [
+                        { name: "Specialties Sub-rotations", desc: "Ophthalmology, ENT, Dermatology, Psychiatry.", completed: false }
+                    ] },
+                    { name: "Semester 10", icon: "🎓", modules: [
+                        { name: "Advanced Medicine & Surgery", desc: "Final intensive clinical preparation and OSCEs.", completed: false }
+                    ] }
+                ]
+            }
+        };
+
+        // Track open dropdowns by module ID string
+        let openDropdowns = new Set();
+
+        // --- Local Storage Integration & Migration ---
+        function loadData() {
+            const saved = localStorage.getItem('medicalJourneyData');
+            if (saved) {
+                try {
+                    let parsedData = JSON.parse(saved);
+                    
+                    // Smart Migration: If older save data doesn't have the exams array for Semesters 1 to 5, inject it.
+                    ['year1', 'year2', 'year3'].forEach(yearId => {
+                        if (parsedData[yearId]) {
+                            parsedData[yearId].semesters.forEach((sem, sIndex) => {
+                                // Apply to Semester 1 (index 0) up to Semester 5 (year 3, index 0)
+                                if (yearId !== 'year3' || (yearId === 'year3' && sIndex === 0)) {
+                                    sem.modules.forEach(mod => {
+                                        if (mod.exams === undefined) {
+                                            mod.exams = getExamTemplate(mod.completed);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    
+                    curriculumData = parsedData;
+                } catch(e) {
+                    console.error("Failed to parse saved progress.");
+                }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('medicalJourneyData', JSON.stringify(curriculumData));
+        }
+
+        const boardView = document.getElementById('board-view');
+        const detailView = document.getElementById('detail-view');
+        const detailHeader = document.getElementById('detail-header');
+        const detailTitle = document.getElementById('detail-title');
+        const detailBadge = document.getElementById('detail-badge');
+        const detailDesc = document.getElementById('detail-desc');
+        const detailContent = document.getElementById('detail-content');
+        
+        let visualProgressPercentage = 0;
+        let actualCompletionPercentage = 0;
+        
+        let reachedNodes = new Set();
+        let completedNodes = new Set();
+        let yearStatsCache = {};
+
+        const yearOrder = ['year1', 'year2', 'year3', 'year4', 'year5'];
+
+        // --- Countdown Timer Logic ---
+        const targetDate = new Date('2029-07-01T00:00:00');
+
+        function updateTimer() {
+            const now = new Date();
+            const distance = targetDate.getTime() - now.getTime();
+            
+            if(distance < 0) {
+                document.getElementById('countdown-timer').innerHTML = "<div class='text-emerald-400 font-extrabold text-lg py-2'>You're a Doctor! 🎉</div>";
+                return;
+            }
+
+            let years = targetDate.getFullYear() - now.getFullYear();
+            let months = targetDate.getMonth() - now.getMonth();
+            let days = targetDate.getDate() - now.getDate();
+            
+            if (days < 0) {
+                months--;
+                const prevMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('cd-years').innerText = years;
+            document.getElementById('cd-months').innerText = months;
+            document.getElementById('cd-days').innerText = days;
+            document.getElementById('cd-hours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('cd-minutes').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('cd-seconds').innerText = seconds.toString().padStart(2, '0');
+        }
+
+        function init() {
+            loadData(); // Load saved progress before doing anything else
+            syncGradientWidth();
+            window.addEventListener('resize', syncGradientWidth);
+            calculatePendingProgress();
+            applyProgressToBoard(true); 
+            
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+
+        function syncGradientWidth() {
+            const track = document.getElementById('track-container');
+            const gradient = document.getElementById('gradient-bg');
+            if(track && gradient) {
+                gradient.style.width = track.offsetWidth + 'px';
+            }
+        }
+
+        // Dropdown Animation Logic - Toggles classes instead of forcing a re-render
+        window.toggleDropdown = function(modId, yearId) {
+            const btn = document.getElementById(`dropdown-btn-${modId}`);
+            const wrapper = document.getElementById(`dropdown-wrapper-${modId}`);
+            
+            if (openDropdowns.has(modId)) {
+                openDropdowns.delete(modId);
+                if (wrapper) wrapper.classList.remove('open');
+                if (btn) btn.classList.remove('rotate-180');
+            } else {
+                openDropdowns.add(modId);
+                if (wrapper) wrapper.classList.add('open');
+                if (btn) btn.classList.add('rotate-180');
+            }
+        }
+
+        // Module Checkbox Logic
+        window.toggleModule = function(yearId, semesterIndex, moduleIndex) {
+            const mod = curriculumData[yearId].semesters[semesterIndex].modules[moduleIndex];
+            const newState = !mod.completed;
+            mod.completed = newState;
+            
+            // Sync all sub-exams to the new state
+            if (mod.exams) {
+                mod.exams.forEach(e => e.completed = newState);
+            }
+            
+            saveData(); 
+            renderModalContent(yearId, semesterIndex, moduleIndex);
+            calculatePendingProgress();
+            // applyProgressToBoard is INTENTIONALLY NOT CALLED HERE so the user gets to see the progress shoot forward when closing the modal!
+        };
+
+        // Exam Sub-Task Checkbox Logic
+        window.toggleExam = function(yearId, semesterIndex, moduleIndex, examIndex) {
+            const mod = curriculumData[yearId].semesters[semesterIndex].modules[moduleIndex];
+            mod.exams[examIndex].completed = !mod.exams[examIndex].completed;
+            
+            // Automatically complete parent module if all exams are checked
+            mod.completed = mod.exams.every(e => e.completed);
+            
+            saveData();
+            renderModalContent(yearId);
+            calculatePendingProgress();
+            // applyProgressToBoard is INTENTIONALLY NOT CALLED HERE
+        };
+
+        function calculatePendingProgress() {
+            let equatedProgress = 0;
+
+            yearOrder.forEach(yearId => {
+                let yTotalPoints = 0;
+                let yCompPoints = 0;
+                let allModsComplete = true;
+                let modCount = 0;
+
+                curriculumData[yearId].semesters.forEach(sem => {
+                    sem.modules.forEach(mod => {
+                        modCount++;
+                        if (!mod.completed) allModsComplete = false;
+                        
+                        // Count sub-tasks for accurate point distribution inside the year
+                        if (mod.exams && mod.exams.length > 0) {
+                            yTotalPoints += mod.exams.length;
+                            yCompPoints += mod.exams.filter(e => e.completed).length;
+                        } else {
+                            yTotalPoints += 1;
+                            yCompPoints += mod.completed ? 1 : 0;
+                        }
+                    });
+                });
+                
+                yearStatsCache[yearId] = {
+                    total: yTotalPoints,
+                    comp: yCompPoints,
+                    isCompleted: modCount > 0 && allModsComplete
+                };
+                
+                // Each year is weighted exactly as 20% of the overall journey
+                if (yTotalPoints > 0) {
+                    equatedProgress += (yCompPoints / yTotalPoints) * 20;
+                }
+            });
+            
+            let finalPercentage = Math.round(equatedProgress);
+            
+            actualCompletionPercentage = finalPercentage;
+            visualProgressPercentage = finalPercentage;
+        }
+
+        // Executes the animation sequence on the board
+        function applyProgressToBoard(isInit = false) {
+            const fillEl = document.getElementById('progress-fill');
+            fillEl.style.width = visualProgressPercentage + '%';
+            document.getElementById('overall-progress-text').textContent = actualCompletionPercentage + '%';
+
+            let energyColor = 'rgba(6, 182, 212, 0.8)'; // Cyan
+            let bgColor = 'linear-gradient(90deg, #0ea5e9, #06b6d4)';
+            
+            if (actualCompletionPercentage > 20 && actualCompletionPercentage <= 40) {
+                energyColor = 'rgba(16, 185, 129, 0.8)';
+                bgColor = 'linear-gradient(90deg, #06b6d4, #10b981)';
+            } else if (actualCompletionPercentage > 40 && actualCompletionPercentage <= 60) {
+                energyColor = 'rgba(245, 158, 11, 0.8)';
+                bgColor = 'linear-gradient(90deg, #10b981, #f59e0b)';
+            } else if (actualCompletionPercentage > 60 && actualCompletionPercentage <= 80) {
+                energyColor = 'rgba(244, 63, 94, 0.8)';
+                bgColor = 'linear-gradient(90deg, #f59e0b, #f43f5e)';
+            } else if (actualCompletionPercentage > 80) {
+                energyColor = 'rgba(139, 92, 246, 0.8)';
+                bgColor = 'linear-gradient(90deg, #f43f5e, #8b5cf6)';
+            }
+            
+            fillEl.style.background = bgColor;
+            fillEl.style.boxShadow = `0 0 20px 2px ${energyColor}`;
+            fillEl.style.setProperty('--tip-glow', energyColor);
+
+            const nodeReachLogic = {
+                'year1': true, // Start
+                'year2': yearStatsCache['year1'].isCompleted,
+                'year3': yearStatsCache['year2'].isCompleted,
+                'year4': yearStatsCache['year3'].isCompleted,
+                'year5': yearStatsCache['year4'].isCompleted,
+                'grad':  yearStatsCache['year5'].isCompleted
+            };
+
+            const nodeCompleteLogic = {
+                'year1': yearStatsCache['year1'].isCompleted,
+                'year2': yearStatsCache['year2'].isCompleted,
+                'year3': yearStatsCache['year3'].isCompleted,
+                'year4': yearStatsCache['year4'].isCompleted,
+                'year5': yearStatsCache['year5'].isCompleted,
+                'grad':  yearStatsCache['year5'].isCompleted 
+            };
+
+            const delay = isInit ? 0 : 1500; 
+
+            for (const nodeId of Object.keys(nodeReachLogic)) {
+                const markerWrapper = document.getElementById(`marker-${nodeId}`);
+                if (!markerWrapper) continue;
+                
+                const isReached = nodeReachLogic[nodeId];
+                const isCompleted = nodeCompleteLogic[nodeId];
+                
+                if (isReached && !reachedNodes.has(nodeId)) {
+                    reachedNodes.add(nodeId);
+                    
+                    if (isInit) {
+                        markerWrapper.classList.add('node-reached');
+                        if (nodeId === 'grad') markerWrapper.classList.add('grad-unlocked');
+                    } else {
+                        setTimeout(() => {
+                            markerWrapper.classList.add('node-reached');
+                            if (nodeId === 'grad') {
+                                markerWrapper.classList.add('grad-unlocked');
+                            } else {
+                                markerWrapper.classList.add('anim-flash-glow');
+                                setTimeout(() => { markerWrapper.classList.remove('anim-flash-glow'); }, 1200);
+                            }
+                        }, delay);
+                    }
+                } else if (!isReached && reachedNodes.has(nodeId)) {
+                    reachedNodes.delete(nodeId);
+                    markerWrapper.classList.remove('node-reached', 'grad-unlocked');
+                }
+                
+                if (isCompleted && !completedNodes.has(nodeId)) {
+                    completedNodes.add(nodeId);
+                    
+                    if (isInit) {
+                        markerWrapper.classList.add('node-completed');
+                    } else {
+                        setTimeout(() => {
+                            markerWrapper.classList.add('node-completed');
+                            if(nodeId !== 'grad') {
+                                markerWrapper.classList.add('anim-complete');
+                                setTimeout(() => markerWrapper.classList.remove('anim-complete'), 1800);
+                            }
+                        }, delay + 200);
+                    }
+                } else if (!isCompleted && completedNodes.has(nodeId)) {
+                    completedNodes.delete(nodeId);
+                    markerWrapper.classList.remove('node-completed', 'anim-complete');
+                }
+            }
+        }
+
+        function renderModalContent(yearId, animSemIndex = -1, animModIndex = -1) {
+            const data = curriculumData[yearId];
+            
+            // Calculate strictly for the internal Year Progress Bar using exam sub-tasks
+            let yearTotalPoints = 0;
+            let yearCompPoints = 0;
+            data.semesters.forEach(sem => {
+                sem.modules.forEach(mod => {
+                    if (mod.exams && mod.exams.length > 0) {
+                        yearTotalPoints += mod.exams.length;
+                        yearCompPoints += mod.exams.filter(e => e.completed).length;
+                    } else {
+                        yearTotalPoints += 1;
+                        yearCompPoints += mod.completed ? 1 : 0;
+                    }
+                });
+            });
+            const yearPercentage = yearTotalPoints > 0 ? Math.round((yearCompPoints / yearTotalPoints) * 100) : 0;
+            
+            const detailProgressFill = document.getElementById('detail-progress-fill');
+            const detailProgressText = document.getElementById('detail-progress-text');
+            if (detailProgressFill && detailProgressText) {
+                setTimeout(() => {
+                    detailProgressFill.style.width = yearPercentage + '%';
+                    detailProgressText.textContent = yearPercentage + '%';
+                }, 50);
+            }
+
+            let contentHTML = '<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">';
+            
+            data.semesters.forEach((semester, index) => {
+                const semTotalMods = semester.modules.length;
+                const semCompMods = semester.modules.filter(m => m.completed).length;
+                const isSemCompleted = semTotalMods === semCompMods && semTotalMods > 0;
+                
+                const cardBg = isSemCompleted ? 'bg-slate-800 border-'+data.themeColor : 'bg-slate-800/50 border-slate-700';
+                const opacity = isSemCompleted ? 'opacity-100' : 'opacity-80';
+
+                contentHTML += `
+                    <div class="rounded-2xl p-6 shadow-lg border transition-all duration-300 ${cardBg} ${opacity}">
+                        <div class="flex items-center justify-between mb-6 border-b border-slate-700 pb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-xl bg-slate-900 flex items-center justify-center text-3xl border border-slate-700 shadow-inner">
+                                    ${semester.icon}
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-white">${semester.name}</h3>
+                                    <span class="text-xs font-semibold ${isSemCompleted ? 'text-'+data.themeColor : 'text-slate-400'}">${isSemCompleted ? 'COMPLETED' : 'IN PROGRESS'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right flex-shrink-0">
+                                <span class="text-[10px] font-bold px-3 py-1.5 rounded-full border tracking-widest ${isSemCompleted ? 'bg-emerald-900/40 text-emerald-400 border-emerald-700/50 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-slate-900/50 text-slate-400 border-slate-700'}">
+                                    ${semCompMods}/${semTotalMods} MODS
+                                </span>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                `;
+                
+                semester.modules.forEach((mod, mIndex) => {
+                    const modId = `${yearId}-${index}-${mIndex}`;
+                    const hasExams = mod.exams && mod.exams.length > 0;
+                    const isDropdownOpen = openDropdowns.has(modId);
+                    
+                    const isJustTicked = (index === animSemIndex && mIndex === animModIndex && mod.completed);
+                    const animationClass = isJustTicked ? 'animate-card-success' : '';
+                    
+                    contentHTML += `
+                        <div class="group p-4 rounded-xl transition-all duration-300 flex flex-col gap-4 border ${mod.completed ? 'bg-slate-800/80 border-'+data.themeColor : 'bg-slate-900/50 border-slate-700 hover:border-'+data.themeColor} ${animationClass}" style="--marker-color: ${data.themeColor.replace('500', '400')}">
+                            
+                            <!-- Module Top Row -->
+                            <div class="flex justify-between items-center gap-4">
+                                <div class="flex items-start gap-3 w-full ${hasExams ? 'cursor-pointer' : ''}" ${hasExams ? `onclick="toggleDropdown('${modId}', '${yearId}')"` : ''}>
+                                    <div class="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-${data.themeColor} shadow-[0_0_8px_rgba(255,255,255,0.5)]"></div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold transition-colors ${mod.completed ? 'text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]' : 'text-slate-300 group-hover:text-white'}">${mod.name}</h4>
+                                        <p class="text-sm text-slate-400 mt-1 leading-relaxed">${mod.desc}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    ${hasExams ? `
+                                        <button id="dropdown-btn-${modId}" onclick="toggleDropdown('${modId}', '${yearId}')" class="p-1 text-slate-500 hover:text-white transform transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                        </button>
+                                    ` : ''}
+
+                                    <!-- Delete Button -->
+                                    <button onclick="openDeleteModal('${yearId}', ${index}, ${mIndex})" class="p-1.5 text-slate-600 hover:text-rose-500 hover:bg-slate-800 rounded-md transition-all" title="Delete Module">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+
+                                    <!-- Deep Module Checkbox -->
+                                    <div class="relative inline-flex items-center justify-center w-8 h-8">
+                                        <input type="checkbox" id="mod-${modId}" class="peer sr-only" ${mod.completed ? 'checked' : ''} onchange="toggleModule('${yearId}', ${index}, ${mIndex})"/>
+                                        <label for="mod-${modId}" class="w-7 h-7 rounded-md border-2 border-slate-500 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 cursor-pointer transition-all flex items-center justify-center hover:border-emerald-400 shadow-inner">
+                                            <svg class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transform scale-50 peer-checked:scale-100 transition-all duration-300 font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Exams Dropdown Container (Smooth Grid Animation) -->
+                            ${hasExams ? `
+                                <div id="dropdown-wrapper-${modId}" class="dropdown-wrapper ${isDropdownOpen ? 'open' : ''}">
+                                    <div class="dropdown-inner">
+                                        <div class="pl-5 space-y-2 border-l-2 border-slate-700/50 mt-2 pb-1">
+                                            ${mod.exams.map((exam, eIndex) => `
+                                                <div class="flex items-center justify-between py-1.5 px-3 rounded-lg bg-slate-900/60 border ${exam.completed ? 'border-emerald-500/30 bg-emerald-900/10' : 'border-slate-700/50'} hover:border-slate-500 transition-colors">
+                                                    <span class="text-xs font-semibold ${exam.completed ? 'text-emerald-400' : 'text-slate-400'}">${exam.name}</span>
+                                                    <div class="relative inline-flex items-center justify-center w-6 h-6">
+                                                        <input type="checkbox" id="exam-${modId}-${eIndex}" class="peer sr-only" ${exam.completed ? 'checked' : ''} onchange="toggleExam('${yearId}', ${index}, ${mIndex}, ${eIndex})"/>
+                                                        <label for="exam-${modId}-${eIndex}" class="w-5 h-5 rounded border border-slate-500 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 cursor-pointer flex items-center justify-center">
+                                                            <svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                        </div>
+                    `;
+                });
+
+                // Add Module Button
+                contentHTML += `
+                            <button onclick="openAddModal('${yearId}', ${index})" class="mt-2 w-full py-2.5 rounded-xl border-2 border-dashed border-slate-700 text-slate-500 hover:text-${data.themeColor} hover:border-${data.themeColor} hover:bg-slate-800/50 transition-all flex items-center justify-center gap-2 font-semibold text-sm">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Add Custom Module
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            contentHTML += '</div>';
+            detailContent.innerHTML = contentHTML;
+        }
+
+        window.openYear = function(yearId) {
+            const data = curriculumData[yearId];
+            if (!data) return;
+
+            detailTitle.textContent = data.title;
+            detailBadge.textContent = data.badge;
+            detailDesc.textContent = data.desc;
+            
+            const colorMap = {
+                'cyan-500': 'linear-gradient(135deg, #0f172a 0%, #0891b2 100%)',
+                'emerald-500': 'linear-gradient(135deg, #0f172a 0%, #059669 100%)',
+                'amber-500': 'linear-gradient(135deg, #0f172a 0%, #d97706 100%)',
+                'rose-500': 'linear-gradient(135deg, #0f172a 0%, #e11d48 100%)',
+                'violet-500': 'linear-gradient(135deg, #0f172a 0%, #7c3aed 100%)'
+            };
+            detailHeader.style.background = colorMap[data.themeColor];
+
+            renderModalContent(yearId);
+
+            boardView.classList.add('scale-110', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                detailView.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+                detailView.classList.add('opacity-100', 'scale-100');
+            }, 150);
+        };
+
+        window.closeYear = function() {
+            detailView.classList.remove('opacity-100', 'scale-100');
+            detailView.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+            
+            setTimeout(() => {
+                boardView.classList.remove('scale-110', 'opacity-0', 'pointer-events-none');
+                
+                document.getElementById('detail-progress-fill').style.width = '0%';
+                document.getElementById('detail-progress-text').textContent = '0%';
+
+                // Trigger the main board animations once the user gets back outside!
+                setTimeout(() => {
+                    applyProgressToBoard();
+                }, 400);
+
+            }, 300);
+        };
+
+        // --- Custom Modals Logic (Add / Delete) ---
+        let actionYearId = null;
+        let actionSemIndex = null;
+        let actionModIndex = null;
+
+        window.openAddModal = function(yearId, semIndex) {
+            actionYearId = yearId;
+            actionSemIndex = semIndex;
+            document.getElementById('new-mod-name').value = '';
+            document.getElementById('new-mod-desc').value = '';
+            
+            const modal = document.getElementById('add-modal');
+            const panel = document.getElementById('add-modal-panel');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            panel.classList.remove('scale-95');
+            panel.classList.add('scale-100');
+            document.getElementById('new-mod-name').focus();
+        };
+
+        window.closeAddModal = function() {
+            const modal = document.getElementById('add-modal');
+            const panel = document.getElementById('add-modal-panel');
+            panel.classList.remove('scale-100');
+            panel.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }, 200);
+        };
+
+        window.confirmAddModule = function() {
+            const nameInput = document.getElementById('new-mod-name').value.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const descInput = document.getElementById('new-mod-desc').value.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            if(!nameInput) return;
+            
+            // New custom modules in Semesters 1-5 get the exam dropdown by default
+            const needsExams = ['year1', 'year2'].includes(actionYearId) || (actionYearId === 'year3' && actionSemIndex === 0);
+            
+            const newMod = {
+                name: nameInput,
+                desc: descInput || "Custom added module.",
+                completed: false
+            };
+            if(needsExams) newMod.exams = getExamTemplate(false);
+            
+            curriculumData[actionYearId].semesters[actionSemIndex].modules.push(newMod);
+            
+            saveData();
+            calculatePendingProgress();
+            renderModalContent(actionYearId);
+            closeAddModal();
+        };
+
+        window.openDeleteModal = function(yearId, semIndex, modIndex) {
+            actionYearId = yearId;
+            actionSemIndex = semIndex;
+            actionModIndex = modIndex;
+            
+            const modal = document.getElementById('delete-modal');
+            const panel = document.getElementById('delete-modal-panel');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            panel.classList.remove('scale-95');
+            panel.classList.add('scale-100');
+        };
+
+        window.closeDeleteModal = function() {
+            const modal = document.getElementById('delete-modal');
+            const panel = document.getElementById('delete-modal-panel');
+            panel.classList.remove('scale-100');
+            panel.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }, 200);
+        };
+
+        window.confirmDeleteModule = function() {
+            curriculumData[actionYearId].semesters[actionSemIndex].modules.splice(actionModIndex, 1);
+            
+            saveData();
+            calculatePendingProgress();
+            renderModalContent(actionYearId);
+            closeDeleteModal();
+        };
+
+        init();
+    </script>
+</body>
+</html>
